@@ -1,0 +1,96 @@
+const translation = {
+  "nav": {
+    "archive": "ARCHIVIO",
+    "expeditions": "SPEDIZIONI",
+    "innerCircle": "CERCHIO INTERNO"
+  },
+  "hero": {
+    "badge": "[ RETE UNDERGROUND DELL'ECUADOR // FONDATA 2014 ]",
+    "title1": "12 Anni",
+    "title2": "Son Solo Stati",
+    "title3": "L'Inizio.",
+    "description": "L'apice indiscussa della cultura musicale elettronica in Ecuador. Audio ad alta fedeltà, scala internazionale, zero compromessi.",
+    "cta1": "[ ESPLORA LE SPEDIZIONI",
+    "cta2": "[ GUARDA GLI AFTERMOVIE ]",
+    "alt": "Folla WonderGround sotto laser arancioni tattici",
+    "stats": {
+      "years": "ANNI ATTIVI",
+      "provinces": "PROVINCE",
+      "attendees": "PARTECIPANTI",
+      "shows": "SHOW CONFERMATI"
+    }
+  },
+  "marquee": {
+    "items": ["QUITO", "CUENCA", "GUAYAQUIL", "TECNOMELODICO", "ZERO COMPROMESSI", "ALTA FEDELTÀ", "RETE SOVRANA"]
+  },
+  "archive": {
+    "label": "AFTERMOVIE // L'ARCHIVIO",
+    "title": "Il Feed Culto dei Replay",
+    "description": "Prova documentata. Ogni spedizione catturata ad alta fedeltà — riassunti verticali dall'archivio WonderGround."
+  },
+  "expeditions": {
+    "label": "CARTellone // CICLO 2026",
+    "title": "Spedizioni\nConfermate",
+    "live": "IN DIRETTA",
+    "lives": "{{count}} IN DIRETTA",
+    "symphone": {
+      "description": "Una fusión cultural senza precedenti. Potenza orchestrale ao vivo fusa con il suono underground più raffinato del paese.",
+      "tag": "20% SCONTO CON DEUNA",
+      "cta": "OTTIENI ACCESSO"
+    },
+    "korolova": {
+      "description": "12 anni di evoluzione. L'icona globale del Techno Melodico torna per un set storico esteso.",
+      "tag": "PRE-VENDITA ESCLUSIVA",
+      "cta": "PRENOTA PASS"
+    },
+    "padre": {
+      "description": "Alla ricerca di talento nazionale per aprire una notte storica di B2B Techno Melodico.",
+      "tag": "CHIAMATA APERTA NAZIONALE",
+      "cta": "CANDIDATI ORA"
+    }
+  },
+  "replay": {
+    "getAction": "OTTIENI BIGLIETTI",
+    "replayAction": "GUARDA REPETITION"
+  },
+  "circle": {
+    "label": "CERCHIO INTERNO // WONDERGROUND VIP",
+    "titleAccess": "L'accesso viene ",
+    "titleGranted": "concesso",
+    "titleNever": ", mai venduto.",
+    "description": "Pre-vendite segrete, logistica shuttle interprovinciale e pass backstage — distribuiti solo attraverso la rete diretta.",
+    "emailPlaceholder": "tua@email.com",
+    "cta": "[ UNISCITI AL CANALE WHATSAPP",
+    "statusGranted": "RICHIESTA RICEVUTA — INVITO AL CANALE INVIATO.",
+    "statusDefault": "CANALE CRIPTATO // NO SPAM // LASCIA IN QUALSIASI MOMENTO"
+  },
+  "footer": {
+    "copy": "WONDERGROUND ECUADOR. RETE SOVRANA DI MUSICA ELETTRONICA — QUITO • CUENCA • GUAYAQUIL. © 2026. TUTTI I DIRITTI RISERVATI.",
+    "archive": "ARCHIVIO",
+    "expeditions": "SPEDIZIONI",
+    "vip": "VIP"
+  },
+  "error": {
+    "notFound": "Pagina non trovata",
+    "notFoundDescription": "La pagina che cerchi non esiste o è stata spostata.",
+    "pageFailed": "Questa pagina non si è caricata",
+    "pageFailedDescription": "Qualcosa è andato storto dalla nostra parte. Puoi provare a tornare alla home.",
+    "tryAgain": "Riprova",
+    "goHome": "Torna alla home"
+  },
+  "aria": {
+    "changeLanguage": "Cambia lingua",
+    "emailAddress": "Indirizzo email",
+    "playAftermovie": "Riproduci aftermovie di {{event}}",
+    "closeReplay": "Chiudi repetition"
+  },
+  "lang": {
+    "es": "Español",
+    "en": "English",
+    "it": "Italiano",
+    "fr": "Français",
+    "de": "Deutsch",
+    "pt": "Português"
+  }
+};
+export default translation;

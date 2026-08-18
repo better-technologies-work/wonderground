@@ -1,0 +1,96 @@
+const translation = {
+  "nav": {
+    "archive": "ARCHIV",
+    "expeditions": "EXPEDITIONEN",
+    "innerCircle": "INNERER KREIS"
+  },
+  "hero": {
+    "badge": "[ ECUADOR UNDERGROUND NETZWERK // GES. 2014 ]",
+    "title1": "12 Jahre",
+    "title2": "Waren Nur Der",
+    "title3": "Anfang.",
+    "description": "Der unangefochtene Höhepunkt der elektronischen Musikultur in Ecuador. Hochauflösende Audio, internationaler Maßstab, null Kompromisse.",
+    "cta1": "[ EXPEDITIONEN ERKUNDEN",
+    "cta2": "[ AFTERMOVIES ANSEHEN ]",
+    "alt": "WonderGround-Menschenmenge unter taktischen orangefarbenen Lasern",
+    "stats": {
+      "years": "AKTIVE JAHRE",
+      "provinces": "PROVINZEN",
+      "attendees": "TEILNEHMER",
+      "shows": "BESTÄTIGTE SHOWS"
+    }
+  },
+  "marquee": {
+    "items": ["QUITO", "CUENCA", "GUAYAQUIL", "MELODISCHER TECHNO", "NULL KOMPROMISSE", "HOCHAUFLÖSEND", "SOUVERÄNES NETZWERK"]
+  },
+  "archive": {
+    "label": "AFTERMOVIES // DAS ARCHIV",
+    "title": "Der Kult Replay-Feed",
+    "description": "Dokumentierte Beweise. Jede Expedition in Hochauflösend aufgenommen — vertikale Recap aus dem WonderGround-Archiv."
+  },
+  "expeditions": {
+    "label": "PLAKATE // 2026 ZYKLUS",
+    "title": "Bestätigte\nExpeditionen",
+    "live": "LIVE",
+    "lives": "{{count}} LIVE",
+    "symphone": {
+      "description": "Eine beispiellose kulturelle Verschmelzung. Live-orchestrale Kraft verschmolzen mit dem raffiniertesten Underground-Sound des Landes.",
+      "tag": "20% RABATT MIT DEUNA",
+      "cta": "ZUGANG SICHERN"
+    },
+    "korolova": {
+      "description": "12 Jahre Evolution. Das globale Melodic-Techno-Ikone kehrt für ein erweitertes historisches Set zurück.",
+      "tag": "EXKLUSIVE VORVERKAUF",
+      "cta": "PASS RESERVIEREN"
+    },
+    "padre": {
+      "description": "Auf der Suche nach nationalem Talent, um einen historischen B2B Melodic Techno Abend zu eröffnen.",
+      "tag": "NATIONALE AUSSCHREIBUNG",
+      "cta": "JETZT BEWERBEN"
+    }
+  },
+  "replay": {
+    "getAction": "TICKETS KAUFEN",
+    "replayAction": "SHOW ANSEHEN"
+  },
+  "circle": {
+    "label": "INNERER KREIS // WONDERGROUND VIP",
+    "titleAccess": "Der Zugang wird ",
+    "titleGranted": "gewährt",
+    "titleNever": ", nie verkauft.",
+    "description": "Geheime Vorverkäufe, interprovinzielle Shuttle-Logistik und Backstage-Pässe — nur über das direkte Netzwerk verteilt.",
+    "emailPlaceholder": "deine@email.com",
+    "cta": "[ WHATSAPP-KANAL BEITRETEN",
+    "statusGranted": "ANFRAGE EMPFANGEN — KANAL-EINLADUNG GESENDET.",
+    "statusDefault": "VERSCHLÜSSELER KANAL // KEIN SPAM // JEDERZEIT VERLASSEN"
+  },
+  "footer": {
+    "copy": "WONDERGROUND ECUADOR. SOUVERÄNES ELEKTRONISCHES MUSIKNETZWERK — QUITO • CUENCA • GUAYAQUIL. © 2026. ALLE RECHTE VORBEHALTEN.",
+    "archive": "ARCHIV",
+    "expeditions": "EXPEDITIONEN",
+    "vip": "VIP"
+  },
+  "error": {
+    "notFound": "Seite nicht gefunden",
+    "notFoundDescription": "Die Seite, die Sie suchen, existiert nicht oder wurde verschoben.",
+    "pageFailed": "Diese Seite konnte nicht geladen werden",
+    "pageFailedDescription": "Auf unserer Seite ist ein Fehler aufgetreten. Sie können versuchen, zur Startseite zurückzukehren.",
+    "tryAgain": "Erneut versuchen",
+    "goHome": "Zur Startseite"
+  },
+  "aria": {
+    "changeLanguage": "Sprache ändern",
+    "emailAddress": "E-Mail-Adresse",
+    "playAftermovie": "Aftermovie von {{event}} abspielen",
+    "closeReplay": "Wiedergabe schließen"
+  },
+  "lang": {
+    "es": "Español",
+    "en": "English",
+    "it": "Italiano",
+    "fr": "Français",
+    "de": "Deutsch",
+    "pt": "Português"
+  }
+};
+export default translation;
