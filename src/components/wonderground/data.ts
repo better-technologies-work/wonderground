@@ -2,6 +2,7 @@ import type { TFunction } from "i18next";
 import symphone from "@/assets/event-symphone.jpg";
 import korolova from "@/assets/event-korolova.jpg";
 import padre from "@/assets/event-padre.jpg";
+import korolovaVideo from "@/assets/korolova-video.mp4";
 
 export type Expedition = {
   id: string;
@@ -13,6 +14,7 @@ export type Expedition = {
   tag: string;
   cta: string;
   image: string;
+  video?: string;
   status: "LIVE" | "PRESALE" | "OPEN";
 };
 
@@ -40,6 +42,7 @@ export function getExpeditions(t: TFunction): Expedition[] {
       tag: t("expeditions.korolova.tag"),
       cta: t("expeditions.korolova.cta"),
       image: korolova,
+      video: korolovaVideo,
       status: "PRESALE",
     },
     {
@@ -65,6 +68,7 @@ export type Replay = {
   year: string;
   duration: string;
   image: string;
+  video?: string;
   action: string;
 };
 
@@ -98,6 +102,7 @@ export function getReplays(t: TFunction): Replay[] {
       year: "2024",
       duration: "05:02",
       image: korolova,
+      video: korolovaVideo,
       action: t("replay.replayAction"),
     },
   ];

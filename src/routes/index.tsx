@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -19,7 +19,8 @@ import heroImage from "@/assets/hero.jpg";
 import { AudioWaves, MiniVisualizer } from "@/components/wonderground/AudioWaves";
 import { getExpeditions, getReplays, type Replay } from "@/components/wonderground/data";
 import { useWgContent } from "@/lib/useWgContent";
-import { ContentCard } from "@/components/wonderground/ContentCard";
+import { ContentCard, MuteButton, VideoWithMute, MediaCarousel } from "@/components/wonderground/ContentCard";
+import type { WgContent } from "@/lib/supabase";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -62,6 +63,7 @@ function SectionLabel({ index, children }: { index: string; children: string }) 
 
 function Landing() {
   const [openReplay, setOpenReplay] = useState<Replay | null>(null);
+  const [openFeedItem, setOpenFeedItem] = useState<WgContent | null>(null);
   const [email, setEmail] = useState("");
   const [joined, setJoined] = useState(false);
   const { t, i18n } = useTranslation();
@@ -73,6 +75,10 @@ function Landing() {
   const { items: feedCultoItems } = useWgContent("feed-culto");
   const { items: expedicionesItems } = useWgContent("expediciones-confirmadas");
 
+  if (feedCultoItems.length > 0) {
+    console.log("Feed Culto items:", feedCultoItems.map(i => ({ title: i.title, media: i.media })));
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* NAV */}
@@ -82,7 +88,7 @@ function Landing() {
             <img
               src="/logo.png"
               alt="WonderGround Ecuador"
-              className="h-10 w-auto shrink-0 object-contain sm:h-12"
+              className="h-[3.3rem] w-auto shrink-0 object-contain sm:h-[3.85rem] brightness-0 invert"
             />
           </a>
           <nav className="flex shrink-0 items-center gap-6 font-mono text-[11px] text-muted-foreground">
@@ -259,14 +265,22 @@ function Landing() {
               transition={{ duration: 0.7, ease, delay: i * 0.08 }}
               className="group relative aspect-[9/14] overflow-hidden border border-border bg-card transition-colors duration-500 hover:border-primary/70"
             >
-              <img
-                src={r.image}
-                alt={`${r.event} aftermovie still`}
-                loading="lazy"
-                width={1024}
-                height={1280}
-                className="absolute inset-0 h-full w-full object-cover opacity-65 transition-all duration-700 group-hover:scale-[1.06] group-hover:opacity-90"
-              />
+              {r.video ? (
+                <VideoWithMute
+                  src={r.video}
+                  className="absolute inset-0 h-full w-full"
+                  videoClassName="absolute inset-0 h-full w-full object-cover opacity-65 transition-all duration-700 group-hover:scale-[1.06] group-hover:opacity-90"
+                />
+              ) : (
+                <img
+                  src={r.image}
+                  alt={`${r.event} aftermovie still`}
+                  loading="lazy"
+                  width={1024}
+                  height={1280}
+                  className="absolute inset-0 h-full w-full object-cover opacity-65 transition-all duration-700 group-hover:scale-[1.06] group-hover:opacity-90"
+                />
+              )}
               <div className="absolute inset-0 fade-bottom" />
 
               <div className="absolute inset-x-0 top-0 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 p-4 font-mono text-[10px]">
@@ -308,7 +322,13 @@ function Landing() {
             </motion.article>
           ))}
           {feedCultoItems.map((item, i) => (
-            <ContentCard key={item.id} item={item} index={replays.length + i} variant="archive" />
+            <ContentCard
+              key={item.id}
+              item={item}
+              index={replays.length + i}
+              variant="archive"
+              onClick={() => setOpenFeedItem(item)}
+            />
           ))}
         </div>
       </section>
@@ -348,14 +368,22 @@ function Landing() {
                 className="group flex flex-col border border-border bg-background transition-all duration-500 hover:-translate-y-1 hover:border-primary/70 hover:shadow-[var(--glow-soft)]"
               >
                 <div className="relative aspect-[4/3] overflow-hidden">
-                  <img
-                    src={e.image}
-                    alt={`${e.title} key visual`}
-                    loading="lazy"
-                    width={1024}
-                    height={1280}
-                    className="absolute inset-0 h-full w-full object-cover opacity-60 transition-all duration-700 group-hover:scale-105 group-hover:opacity-85"
-                  />
+                  {e.video ? (
+                    <VideoWithMute
+                      src={e.video}
+                      className="absolute inset-0 h-full w-full"
+                      videoClassName="absolute inset-0 h-full w-full object-cover opacity-60 transition-all duration-700 group-hover:scale-105 group-hover:opacity-85"
+                    />
+                  ) : (
+                    <img
+                      src={e.image}
+                      alt={`${e.title} key visual`}
+                      loading="lazy"
+                      width={1024}
+                      height={1280}
+                      className="absolute inset-0 h-full w-full object-cover opacity-60 transition-all duration-700 group-hover:scale-105 group-hover:opacity-85"
+                    />
+                  )}
                   <div className="absolute inset-0 fade-bottom" />
                   <div className="absolute inset-x-0 top-0 grid grid-cols-[minmax(0,1fr)_auto] gap-3 p-4 font-mono text-[10px]">
                     <span className="min-w-0 truncate text-muted-foreground">{e.code}</span>
@@ -455,7 +483,7 @@ function Landing() {
             <img
               src="/logo.png"
               alt="WonderGround Ecuador"
-              className="h-10 w-auto object-contain sm:h-12"
+              className="h-[3.3rem] w-auto object-contain sm:h-[3.85rem] brightness-0 invert"
             />
             <p className="mt-3 max-w-md font-mono text-[10px] leading-relaxed tracking-[0.12em] text-muted-foreground">
               {t("footer.copy")}
@@ -504,11 +532,20 @@ function Landing() {
                 <X className="h-4 w-4" />
               </button>
               <div className="relative aspect-[9/14] overflow-hidden">
-                <img
-                  src={openReplay.image}
-                  alt={`${openReplay.event} replay frame`}
-                  className="absolute inset-0 h-full w-full object-cover opacity-75"
-                />
+                {openReplay.video ? (
+                  <VideoWithMute
+                    src={openReplay.video}
+                    className="absolute inset-0 h-full w-full"
+                    videoClassName="absolute inset-0 h-full w-full object-cover opacity-75"
+                    autoPlay
+                  />
+                ) : (
+                  <img
+                    src={openReplay.image}
+                    alt={`${openReplay.event} replay frame`}
+                    className="absolute inset-0 h-full w-full object-cover opacity-75"
+                  />
+                )}
                 <div className="absolute inset-0 fade-bottom" />
                 <div className="absolute inset-x-0 bottom-0 p-5">
                   <MiniVisualizer active />
@@ -521,6 +558,56 @@ function Landing() {
                   <button className="glow-cta mt-5 w-full bg-primary py-3 font-mono text-[11px] font-bold tracking-[0.16em] text-primary-foreground">
                     [ {openReplay.action} ]
                   </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {openFeedItem && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 grid place-items-center bg-background/90 p-4 backdrop-blur-md"
+            onClick={() => setOpenFeedItem(null)}
+            role="dialog"
+            aria-modal="true"
+            aria-label={openFeedItem.title}
+          >
+            <motion.div
+              initial={{ scale: 0.94, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.96, opacity: 0 }}
+              transition={{ duration: 0.4, ease }}
+              onClick={(ev) => ev.stopPropagation()}
+              className="relative w-full max-w-md border border-primary/40 bg-card"
+            >
+              <button
+                onClick={() => setOpenFeedItem(null)}
+                aria-label="Close"
+                className="absolute top-3 right-3 z-10 grid h-9 w-9 place-items-center border border-border bg-background/70 transition-colors hover:border-primary hover:text-primary"
+              >
+                <X className="h-4 w-4" />
+              </button>
+              <div className="relative aspect-[9/14] overflow-hidden">
+                <MediaCarousel
+                  media={openFeedItem.media}
+                  className="absolute inset-0 h-full w-full opacity-75"
+                />
+                <div className="absolute inset-0 fade-bottom pointer-events-none" />
+                <div className="absolute inset-x-0 bottom-0 p-5 pointer-events-none">
+                  <MiniVisualizer active />
+                  <h3 className="mt-3 font-display text-3xl leading-none font-black uppercase">
+                    {openFeedItem.title}
+                  </h3>
+                  {openFeedItem.description && (
+                    <p className="mt-2 font-mono text-[10px] text-muted-foreground">
+                      {openFeedItem.description}
+                    </p>
+                  )}
                 </div>
               </div>
             </motion.div>

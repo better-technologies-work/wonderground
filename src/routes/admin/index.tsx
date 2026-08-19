@@ -3,6 +3,18 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { supabase, type WgContent, type MediaItem } from "@/lib/supabase";
 import { Plus, Pencil, Trash2, Upload, LogOut, X, Link as LinkIcon, ChevronLeft, ChevronRight } from "lucide-react";
 
+function parseMedia(raw: unknown): MediaItem[] {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw as MediaItem[];
+  if (typeof raw === "string") {
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed as MediaItem[];
+    } catch { /* ignore */ }
+  }
+  return [];
+}
+
 export const Route = createFileRoute("/admin/")({
   component: AdminPanel,
 });
@@ -45,7 +57,11 @@ function AdminPanel() {
       .select("*")
       .order("section")
       .order("order_index");
-    setItems((data as WgContent[]) ?? []);
+    const parsed = (data ?? []).map((row: any) => ({
+      ...row,
+      media: parseMedia(row.media),
+    }));
+    setItems(parsed as WgContent[]);
     setLoading(false);
   }
 
@@ -93,6 +109,29 @@ function AdminPanel() {
     return match ? `https://www.youtube.com/embed/${match[1]}` : null;
   }
 
+  function detectMediaType(file: File): MediaItem["type"] {
+    const mime = (file.type || "").toLowerCase();
+    if (mime.startsWith("video/")) return "video";
+
+    const name = file.name.toLowerCase();
+    const videoExtensions = [
+      ".mp4",
+      ".mov",
+      ".webm",
+      ".ogg",
+      ".avi",
+      ".mkv",
+      ".m4v",
+      ".wmv",
+      ".flv",
+      ".3gp",
+      ".3g2",
+    ];
+
+    if (videoExtensions.some((ext) => name.endsWith(ext))) return "video";
+    return "image";
+  }
+
   async function uploadFiles(section: string): Promise<MediaItem[]> {
     const uploaded: MediaItem[] = [];
     for (const file of files) {
@@ -104,8 +143,7 @@ function AdminPanel() {
         continue;
       }
       const { data } = supabase.storage.from("wonderground-media").getPublicUrl(path);
-      const isVideo = file.type.startsWith("video/");
-      uploaded.push({ type: isVideo ? "video" : "image", url: data.publicUrl });
+      uploaded.push({ type: detectMediaType(file), url: data.publicUrl });
     }
     return uploaded;
   }
@@ -115,15 +153,10 @@ function AdminPanel() {
     const newMedia = await uploadFiles(form.section);
     const allMedia = [...existingMedia, ...newMedia];
 
-    if (allMedia.length === 0) {
-      alert("Agregá al menos un archivo o link de YouTube.");
-      return;
-    }
-
     const payload = {
       title: form.title,
       description: form.description || null,
-      media: allMedia,
+      media: allMedia.length > 0 ? allMedia : [],
       section: form.section,
       order_index: form.order_index,
     };
@@ -344,11 +377,18 @@ function AdminPanel() {
                 <label className="mb-1 block font-mono text-[10px] tracking-[0.16em] text-muted-foreground">
                   LINK DE YOUTUBE
                 </label>
+
                 <div className="flex gap-2">
                   <input
                     type="url"
                     value={youtubeUrl}
                     onChange={(ev) => setYoutubeUrl(ev.target.value)}
+                    onKeyDown={(ev) => {
+                      if (ev.key === "Enter") {
+                        ev.preventDefault();
+                        addYoutubeLink();
+                      }
+                    }}
                     placeholder="https://youtube.com/watch?v=..."
                     className="min-w-0 flex-1 border border-input bg-background px-3 py-2.5 font-mono text-sm text-foreground outline-none focus:border-primary"
                   />
@@ -414,8 +454,10 @@ function MediaPreviewThumb({ media }: { media: MediaItem[] }) {
   if (!current) return <div className="h-10 w-10 shrink-0 bg-border" />;
 
   if (current.type === "youtube") {
-    const embed = current.url.includes("youtu")
-      ? `https://img.youtube.com/vi/${current.url.match(/(?:watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/)?.[1] ?? ""}/default.jpg`
+    const idMatch = current.url.match(/(?:youtube\.com\/(?:watch\?.*?v=|embed\/|live\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/)
+      || current.url.match(/([a-zA-Z0-9_-]{11})/);
+    const embed = idMatch
+      ? `https://img.youtube.com/vi/${idMatch[1]}/default.jpg`
       : "";
     return (
       <div className="relative h-10 w-16 shrink-0 overflow-hidden bg-black">

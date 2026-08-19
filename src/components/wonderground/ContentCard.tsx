@@ -1,22 +1,140 @@
-import { useState } from "react";
-import { ArrowUpRight, ChevronLeft, ChevronRight, Play } from "lucide-react";
+import { useRef, useState } from "react";
+import { ArrowUpRight, ChevronLeft, ChevronRight, Play, Volume2, VolumeX } from "lucide-react";
 import { motion } from "framer-motion";
 import type { MediaItem } from "@/lib/supabase";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
+export function MuteButton({ videoRef, className = "" }: { videoRef: React.RefObject<HTMLVideoElement | null>; className?: string }) {
+  const [muted, setMuted] = useState(true);
+
+  const toggle = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = !v.muted;
+    setMuted(v.muted);
+  };
+
+  return (
+    <button
+      onClick={toggle}
+      className={`grid h-8 w-8 place-items-center rounded-full border border-white/30 bg-black/50 text-white backdrop-blur-sm transition-colors hover:bg-black/70 ${className}`}
+      aria-label={muted ? "Unmute" : "Mute"}
+    >
+      {muted ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
+    </button>
+  );
+}
+
+export function VideoWithMute({
+  src,
+  className = "",
+  videoClassName = "",
+  autoPlay = true,
+}: {
+  src: string;
+  className?: string;
+  videoClassName?: string;
+  autoPlay?: boolean;
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  return (
+    <div className={`relative ${className}`}>
+      <video
+        ref={videoRef}
+        src={src}
+        className={videoClassName || "h-full w-full object-cover"}
+        muted
+        loop
+        playsInline
+        preload="auto"
+        {...(autoPlay ? { autoPlay: true } : {})}
+      />
+      <MuteButton videoRef={videoRef} className="absolute top-14 right-3 z-10" />
+    </div>
+  );
+}
+
+function extractYouTubeId(url: string): string | null {
+  const trimmed = url.trim();
+  if (!trimmed) return null;
+
+  try {
+    const parsed = new URL(trimmed);
+    const hostname = parsed.hostname.replace(/^www\./, "");
+
+    if (hostname === "youtu.be" || hostname.endsWith(".youtu.be")) {
+      const [, id] = parsed.pathname.split("/");
+      if (id && /^[a-zA-Z0-9_-]{11}$/.test(id)) return id;
+    }
+
+    if (
+      hostname === "youtube.com" ||
+      hostname === "m.youtube.com" ||
+      hostname === "music.youtube.com"
+    ) {
+      const videoId = parsed.searchParams.get("v");
+      if (videoId && /^[a-zA-Z0-9_-]{11}$/.test(videoId)) return videoId;
+
+      const segments = parsed.pathname.split("/").filter(Boolean);
+      const candidate = segments[1] ?? segments[0];
+      if (
+        candidate &&
+        ["embed", "shorts", "live", "watch"].includes(segments[0] ?? "") &&
+        /^[a-zA-Z0-9_-]{11}$/.test(candidate)
+      ) {
+        return candidate;
+      }
+    }
+  } catch {
+    // fallback below for malformed URLs
+  }
+
+  const patterns = [
+    /(?:youtube\.com\/(?:watch\?.*?[?&]v=|embed\/|live\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i,
+    /(?:[?&]v=|\/v\/)([a-zA-Z0-9_-]{11})/i,
+    /(?:^|[\/\?&])([a-zA-Z0-9_-]{11})(?:[?&]|$)/,
+  ];
+
+  for (const re of patterns) {
+    const match = trimmed.match(re);
+    if (match) return match[1] ?? match[0];
+  }
+
+  return null;
+}
+
 function getYouTubeEmbed(url: string): string | null {
-  const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-  return match ? `https://www.youtube.com/embed/${match[1]}` : null;
+  const id = extractYouTubeId(url);
+  return id ? `https://www.youtube.com/embed/${id}` : null;
 }
 
 function getYouTubeThumb(url: string): string | null {
-  const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-  return match ? `https://img.youtube.com/vi/${match[1]}/hqdefault.jpg` : null;
+  const id = extractYouTubeId(url);
+  return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : null;
+}
+
+function YouTubeFallback({ url, className = "" }: { url: string; className?: string }) {
+  const thumb = getYouTubeThumb(url);
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`group/yt relative grid place-items-center overflow-hidden ${className}`}
+    >
+      {thumb && <img src={thumb} alt="" className="absolute inset-0 h-full w-full object-cover" />}
+      <span className="relative z-10 grid h-14 w-14 place-items-center rounded-full border border-white/40 bg-black/50 backdrop-blur-md transition-all group-hover/yt:bg-red-600 group-hover/yt:border-red-600">
+        <Play className="h-5 w-5 fill-current text-white ml-0.5" />
+      </span>
+    </a>
+  );
 }
 
 export function MediaCarousel({ media, className = "" }: { media: MediaItem[]; className?: string }) {
   const [idx, setIdx] = useState(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const current = media[idx];
 
   if (!current) return null;
@@ -29,6 +147,20 @@ export function MediaCarousel({ media, className = "" }: { media: MediaItem[]; c
     <div className={`relative overflow-hidden ${className}`}>
       {current.type === "youtube" ? (
         <YouTubeEmbed url={current.url} className="absolute inset-0 h-full w-full" />
+      ) : current.type === "video" ? (
+        <>
+          <video
+            ref={videoRef}
+            src={current.url}
+            className="absolute inset-0 h-full w-full object-cover"
+            muted
+            loop
+            playsInline
+            preload="auto"
+            autoPlay
+          />
+          <MuteButton videoRef={videoRef} className="absolute top-14 right-3 z-10" />
+        </>
       ) : (
         <img
           src={current.url}
@@ -58,8 +190,31 @@ export function MediaCarousel({ media, className = "" }: { media: MediaItem[]; c
 }
 
 function MediaSingle({ item, className = "" }: { item: MediaItem; className?: string }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
   if (item.type === "youtube") {
-    return <YouTubeEmbed url={item.url} className={className} />;
+    return (
+      <div className={`relative ${className}`}>
+        <YouTubeEmbed url={item.url} className="absolute inset-0 h-full w-full" />
+      </div>
+    );
+  }
+  if (item.type === "video") {
+    return (
+      <div className={`relative ${className}`}>
+        <video
+          ref={videoRef}
+          src={item.url}
+          className="h-full w-full object-cover"
+          muted
+          loop
+          playsInline
+          preload="auto"
+          autoPlay
+        />
+        <MuteButton videoRef={videoRef} className="absolute top-14 right-3 z-10" />
+      </div>
+    );
   }
   return (
     <img
@@ -73,7 +228,7 @@ function MediaSingle({ item, className = "" }: { item: MediaItem; className?: st
 
 function YouTubeEmbed({ url, className = "" }: { url: string; className?: string }) {
   const embed = getYouTubeEmbed(url);
-  if (!embed) return null;
+  if (!embed) return <YouTubeFallback url={url} className={className} />;
   return (
     <iframe
       src={embed}
@@ -89,14 +244,18 @@ export function ContentCard({
   item,
   index,
   variant = "archive",
+  onClick,
 }: {
   item: { id: string; title: string; description: string | null; media: MediaItem[] };
   index: number;
   variant?: "archive" | "expedition";
+  onClick?: () => void;
 }) {
   const [playIdx, setPlayIdx] = useState(0);
   const primaryMedia = item.media[0];
   const thumb = primaryMedia?.type === "youtube" ? getYouTubeThumb(primaryMedia.url) : primaryMedia?.url;
+
+  console.log("[ContentCard]", item.title, "media:", JSON.stringify(item.media));
 
   if (variant === "expedition") {
     return (
@@ -153,6 +312,17 @@ export function ContentCard({
     >
       <MediaCarousel media={item.media} className="absolute inset-0 h-full w-full opacity-65 transition-all duration-700 group-hover:scale-[1.06] group-hover:opacity-90" />
       <div className="absolute inset-0 fade-bottom" />
+
+      {onClick && (
+        <button
+          onClick={onClick}
+          className="absolute inset-0 z-10 grid place-items-center"
+        >
+          <span className="grid h-14 w-14 place-items-center rounded-full border border-primary/70 bg-background/40 backdrop-blur-md transition-all duration-500 group-hover:glow-cta group-hover:bg-primary">
+            <Play className="h-5 w-5 fill-current text-primary transition-colors group-hover:text-primary-foreground" />
+          </span>
+        </button>
+      )}
 
       <div className="absolute inset-x-0 bottom-0 p-4">
         <h3 className="font-display text-2xl leading-none font-black tracking-tight uppercase">
